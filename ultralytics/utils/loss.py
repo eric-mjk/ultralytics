@@ -5,6 +5,8 @@ from typing import Any, Dict, List, Tuple
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+# new import
+import numpy as np
 
 from ultralytics.utils.metrics import OKS_SIGMA
 from ultralytics.utils.ops import crop_mask, xywh2xyxy, xyxy2xywh
@@ -490,8 +492,17 @@ class v8PoseLoss(v8DetectionLoss):
         self.bce_pose = nn.BCEWithLogitsLoss()
         is_pose = self.kpt_shape == [17, 3]
         nkpt = self.kpt_shape[0]  # number of keypoints
+
+        # Modified code
+        CUSTOM_SIGMAS = np.array([0.05, 0.05, 0.15])  # Already scaled for OKS
+        sigmas = torch.from_numpy(CUSTOM_SIGMAS).to(self.device)
+        self.keypoint_loss = KeypointLoss(sigmas=sigmas)
+
+        # Original code
+        """
         sigmas = torch.from_numpy(OKS_SIGMA).to(self.device) if is_pose else torch.ones(nkpt, device=self.device) / nkpt
         self.keypoint_loss = KeypointLoss(sigmas=sigmas)
+        """
 
     def __call__(self, preds: Any, batch: Dict[str, torch.Tensor]) -> Tuple[torch.Tensor, torch.Tensor]:
         """Calculate the total loss and detach it for pose estimation."""

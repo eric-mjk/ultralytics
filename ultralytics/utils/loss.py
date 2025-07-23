@@ -494,7 +494,7 @@ class v8PoseLoss(v8DetectionLoss):
         nkpt = self.kpt_shape[0]  # number of keypoints
 
         # Modified code
-        CUSTOM_SIGMAS = np.array([0.05, 0.05, 0.15])  # Already scaled for OKS
+        CUSTOM_SIGMAS = np.array([0.05, 0.02, 0.07])  # Already scaled for OKS
         sigmas = torch.from_numpy(CUSTOM_SIGMAS).to(self.device)
         self.keypoint_loss = KeypointLoss(sigmas=sigmas)
 
